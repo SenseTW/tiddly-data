@@ -1,0 +1,8 @@
+.vs/
+
+bower_components/
+node_modules/
+*.swp
+._*
+
+dist/
