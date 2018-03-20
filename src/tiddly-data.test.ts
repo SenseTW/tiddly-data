@@ -1,10 +1,15 @@
 import * as mocha from 'mocha';
 import { expect } from 'chai';
-import { Wiki, TMap } from './tiddly-data';
+import * as D from './tiddly-data';
+import * as P from './parser';
+import { sampleWiki } from './parser.test';
+
+const parsed = P.TiddlyFile.File.tryParse(sampleWiki);
 
 describe('TiddlyData', () => {
   it('should create a wiki', () => {
-    const w = new Wiki('缺乏基礎研發人材', 20180314035638346, 20180315043436460);
+    const { header } = parsed;
+    const w = new D.Wiki(header.title, +header.created, +header.modified);
 
     expect(w.type).to.be.equal('text/vnd.tiddlywiki');
     expect(w.title).to.be.equal('缺乏基礎研發人材');
@@ -13,7 +18,8 @@ describe('TiddlyData', () => {
   });
 
   it('should created a tiddly map node', () => {
-    const m = new TMap('bdd1331f-d8be-4f51-a0b3-47bf66914265', '缺乏基礎研發人材', 20180314035638346, 20180315043436460);
+    const { header } = parsed;
+    const m = new D.Node(header.tmap.id, header.title, +header.created, +header.modified);
 
     expect(m.type).to.be.equal('text/vnd.tiddlywiki');
     expect(m.title).to.be.equal('缺乏基礎研發人材');

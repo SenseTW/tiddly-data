@@ -20,7 +20,7 @@ export class Wiki {
   }
 }
 
-export class TEdge extends Wiki {
+export class Edge extends Wiki {
   public id: string;
 
   public type: string;
@@ -36,7 +36,7 @@ export class TEdge extends Wiki {
   }
 }
 
-export class TMap extends Wiki {
+export class Node extends Wiki {
   public edges: any[] = [];
 
   public id: string;

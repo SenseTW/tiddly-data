@@ -34,7 +34,7 @@ export const sampleWiki = `
 
 describe('Parser', () => {
   it('should parse a Wikitext header', () => {
-    const w = P.Wikitext.Header.tryParse(sampleHeader);
+    const w = P.TiddlyFile.Header.tryParse(sampleHeader);
 
     // all values are strings
     expect(w.created).to.be.equal('20180314035638346');
@@ -46,7 +46,7 @@ describe('Parser', () => {
   })
 
   it('should parse a Wikitext file', () => {
-    const w = P.Wikitext.File.tryParse(sampleWiki);
+    const w = P.TiddlyFile.File.tryParse(sampleWiki);
 
     expect(w.header).to.be.an.instanceof(Object);
     expect(w.content).to.be.string;

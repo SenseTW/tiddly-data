@@ -2,7 +2,7 @@ import * as P from 'parsimmon';
 import { reduceRight, reduce, mergeDeepRight } from 'ramda';
 
 // the Wikitext parser
-export const Wikitext = P.createLanguage({
+export const TiddlyFile = P.createLanguage({
   Colon: () =>
     P.string(':'),
   Dot: () =>
