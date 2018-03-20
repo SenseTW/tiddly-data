@@ -5,10 +5,10 @@ Tools for processing wikitext files of TiddlyWiki. Plus more tools for nodes and
 # ToDo
 
 * [ ] Model everything
-  * [ ] Wikitext
+  * [x] Wikitext
   * [ ] Map node
   * [ ] Map edge(optional)
-* [ ] Parse wikitext files
+* [x] Parse wikitext files
   * [x] ~~Find a parser~~
   * [x] Write a naive parser with [parsimmon][parsimmon]
 * [ ] Create nodes from Trello cards
