@@ -4,5 +4,6 @@ bower_components/
 node_modules/
 *.swp
 ._*
+.yarn-error.log
 
 dist/
