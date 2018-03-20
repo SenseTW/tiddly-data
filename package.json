@@ -6,8 +6,11 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
-    "build": "tsc",
+    "build": "tsc && chmod 755 dist/bin/tiddly-map.js",
     "test": "mocha --reporter spec --require ts-node/register 'src/**/*.test.ts'"
+  },
+  "bin": {
+    "tiddly-map": "dist/bin/tiddly-map.js"
   },
   "author": "caasi Huang",
   "license": "CC0-1.0",
