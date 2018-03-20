@@ -11,8 +11,7 @@ const parsed = P.TiddlyFile.File.tryParse(sampleWiki);
 
 describe('TiddlyData', () => {
   it('should create a wiki', () => {
-    const { header } = parsed;
-    const w = new D.Wiki(header.title, header.created, header.modified);
+    const w = new D.Wiki(parsed.title, parsed.created, parsed.modified);
 
     expect(w.type).to.be.equal('text/vnd.tiddlywiki');
     expect(w.title).to.be.equal('缺乏基礎研發人材');
@@ -21,8 +20,7 @@ describe('TiddlyData', () => {
   });
 
   it('should created a tiddly map node', () => {
-    const { header } = parsed;
-    const m = new D.Node(header.tmap.id, header.title, header.created, header.modified);
+    const m = new D.Node(parsed.tmap.id, parsed.title, parsed.created, parsed.modified);
 
     expect(m.type).to.be.equal('text/vnd.tiddlywiki');
     expect(m.title).to.be.equal('缺乏基礎研發人材');

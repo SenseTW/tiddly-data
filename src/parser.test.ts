@@ -2,15 +2,6 @@ import * as mocha from 'mocha';
 import { expect } from 'chai';
 import * as P from './parser';
 
-export const sampleHeader = `
-  created: 20180314035638346
-  modified: 20180315043436460
-  title: 缺乏基礎研發人材
-  tmap.edges: {"10061a94-1831-4e19-87b1-9e33dc55eb86":{"to":"33c0840e-ebcf-4144-8cbb-9c71c919dfdc","type":"problem-solution:subproblem"}}
-  tmap.id: bdd1331f-d8be-4f51-a0b3-47bf66914265
-  type: text/vnd.tiddlywiki
-`;
-
 export const sampleWiki = `
   created: 20180314035638346
   modified: 20180315043436460
@@ -33,8 +24,8 @@ export const sampleWiki = `
 `
 
 describe('Parser', () => {
-  it('should parse a Wikitext header', () => {
-    const w = P.TiddlyFile.Header.tryParse(sampleHeader);
+  it('should parse a Wikitext file', () => {
+    const w = P.TiddlyFile.File.tryParse(sampleWiki);
 
     // all values are strings
     expect(w.created).to.be.equal('20180314035638346');
@@ -43,12 +34,6 @@ describe('Parser', () => {
     expect(w.tmap.edges).to.be.equal('{"10061a94-1831-4e19-87b1-9e33dc55eb86":{"to":"33c0840e-ebcf-4144-8cbb-9c71c919dfdc","type":"problem-solution:subproblem"}}');
     expect(w.tmap.id).to.be.equal('bdd1331f-d8be-4f51-a0b3-47bf66914265');
     expect(w.type).to.be.equal('text/vnd.tiddlywiki');
-  })
-
-  it('should parse a Wikitext file', () => {
-    const w = P.TiddlyFile.File.tryParse(sampleWiki);
-
-    expect(w.header).to.be.an.instanceof(Object);
-    expect(w.content).to.be.string;
-  })
-})
+    expect(w.text).to.be.string;
+  });
+});

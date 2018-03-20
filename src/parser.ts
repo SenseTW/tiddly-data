@@ -32,6 +32,6 @@ export const TiddlyFile = P.createLanguage({
   File: (r) =>
     P.seqMap(
       r.Header, P.all,
-      (header, content) => ({ header, content })
+      (headers, text) => ({ ...headers, text })
     )
 });
