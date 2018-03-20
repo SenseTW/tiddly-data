@@ -1,30 +1,25 @@
-import { TEdge, Timestamp } from './tiddly-data';
+import * as D from './tiddly-data';
 
-export class Solution extends TEdge {
-  constructor(id: string, to: string, created: Timestamp, modified: Timestamp) {
-    super(
-      id,
-      to,
-      'problem-solution:solution',
-      '$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/problem-solution:solution',
-      created,
-      modified
-    );
+export class Solution extends D.Node {
+  public to: string;
+
+  constructor({ to = '', ...rest }) {
+    super(rest);
+
+    this.to = to;
   }
 }
 
-export class Subproblem extends TEdge {
-  constructor(id: string, to: string, created: Timestamp, modified: Timestamp) {
-    super(
-      id,
-      to,
-      'problem-solution:subproblem',
-      '$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/problem-solution:subproblem',
-      created,
-      modified
-    );
+export class Subproblem extends D.Node {
+  public to: string;
+  public description: string;
+  public style: string;
 
-    this.description = 'A link from subproblem to parent-problem in problem-solution analysis graph.';
-    this.style = { arrows: { to: { enabled: false } } }
+  constructor({ to = '', description = '', style = '', ...rest }) {
+    super(rest);
+
+    this.to = to;
+    this.description = description;
+    this.style = style;
   }
 }

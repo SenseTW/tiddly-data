@@ -11,7 +11,7 @@ const parsed = P.TiddlyFile.File.tryParse(sampleWiki);
 
 describe('TiddlyData', () => {
   it('should create a wiki', () => {
-    const w = new D.Wiki(parsed.title, parsed.created, parsed.modified);
+    const w = new D.Wiki(parsed);
 
     expect(w.type).to.be.equal('text/vnd.tiddlywiki');
     expect(w.title).to.be.equal('缺乏基礎研發人材');
@@ -20,7 +20,7 @@ describe('TiddlyData', () => {
   });
 
   it('should created a tiddly map node', () => {
-    const m = new D.Node(parsed.tmap.id, parsed.title, parsed.created, parsed.modified);
+    const m = new D.Node(parsed);
 
     expect(m.type).to.be.equal('text/vnd.tiddlywiki');
     expect(m.title).to.be.equal('缺乏基礎研發人材');
@@ -29,13 +29,5 @@ describe('TiddlyData', () => {
 
     expect(m.id).to.be.equal('bdd1331f-d8be-4f51-a0b3-47bf66914265');
     expect(m.edges.length).to.be.equal(0);
-  })
-
-  it('should created a solution edge', () => {
-    throw new Error('not implemented');
-  })
-
-  it('should created a subproblem edge', () => {
-    throw new Error('not implemented');
   })
 });
