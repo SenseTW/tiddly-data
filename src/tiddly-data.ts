@@ -1,11 +1,13 @@
-export type Timestamp = number;
+import * as moment from 'moment';
+
+const TIME_FORMAT = 'YYYYMMDDHHmmssSSS';
 
 export class Wiki {
   public type: string = 'text/vnd.tiddlywiki';
 
-  public created: Timestamp;
+  public created: moment.Moment;
 
-  public modified: Timestamp;
+  public modified: moment.Moment;
 
   public title: string;
 
@@ -13,10 +15,10 @@ export class Wiki {
 
   public style?: object;
 
-  constructor(title: string, created: Timestamp, modified: Timestamp = created) {
+  constructor(title: string, created: string, modified: string = created) {
     this.title = title;
-    this.created = created;
-    this.modified = modified;
+    this.created = moment.utc(created, TIME_FORMAT, true); // strict mode
+    this.modified = moment.utc(modified, TIME_FORMAT, true);
   }
 }
 
@@ -27,7 +29,7 @@ export class Edge extends Wiki {
 
   public to: string;
 
-  constructor(id: string, to: string, type: string, title: string, created: Timestamp, modified: Timestamp) {
+  constructor(id: string, to: string, type: string, title: string, created: string, modified: string) {
     super(title, created, modified);
 
     this.id = id;
@@ -41,7 +43,7 @@ export class Node extends Wiki {
 
   public id: string;
 
-  constructor(id: string, title: string, created: Timestamp, modified: Timestamp) {
+  constructor(id: string, title: string, created: string, modified: string) {
     super(title, created, modified);
 
     this.id = id;
