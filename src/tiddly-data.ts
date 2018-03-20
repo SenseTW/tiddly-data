@@ -20,15 +20,20 @@ export class Wiki {
   }
 }
 
+export type Edge = {
+  type: string;
+  to: string;
+};
+
 export class Node extends Wiki {
   public id: string;
-  public edges: any[];
+  public edges: { [key: string]: Edge };
 
-  constructor({ tmap: { id = '' } = {}, ...rest } = {}) {
+  constructor({ tmap: { id = '', edges = '' } = {}, ...rest } = {}) {
     super(rest);
 
     this.id = id;
-    this.edges = [];
+    this.edges = JSON.parse(edges);
   }
 }
 

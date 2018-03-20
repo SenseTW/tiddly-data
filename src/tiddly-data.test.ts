@@ -30,7 +30,12 @@ describe('TiddlyData', () => {
     expect(w.modified.format(LOCAL_TIME_FORMAT)).to.be.equal('2018-03-15T04:34:36.460');
 
     expect(w.id).to.be.equal('bdd1331f-d8be-4f51-a0b3-47bf66914265');
-    expect(w.edges.length).to.be.equal(0);
+    for (const k in w.edges) {
+      const e = w.edges[k];
+
+      expect(e.type).to.be.equal('problem-solution:subproblem');
+      expect(e.to).to.be.string;
+    }
   })
 
   it('should create a tiddly default map', () => {
