@@ -10,7 +10,7 @@ Tools for processing wikitext files of TiddlyWiki. Plus more tools for nodes and
   * [ ] Map edge(optional)
 * [ ] Parse wikitext files
   * [x] ~~Find a parser~~
-  * [ ] Write a parser with [parsimmon][parsimmon]
+  * [x] Write a naive parser with [parsimmon][parsimmon]
 * [ ] Create nodes from Trello cards
 * [ ] Create nodes from Hypothes.is comments and highlights
 
