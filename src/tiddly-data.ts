@@ -76,7 +76,12 @@ export const WikitextParser = P.createLanguage({
       r.Key, P.optWhitespace, r.Colon, P.optWhitespace, r.Value,
       (ks: string[], _, __, ___, value) => reduceRight((k, acc) => ({ [k]: acc }), value, ks)
     ),
-  File: (r) =>
+  Header: (r) =>
     r.Pair.trim(P.optWhitespace).many()
-      .map(reduce(mergeDeepRight, {}))
+      .map(reduce(mergeDeepRight, {})),
+  File: (r) =>
+    P.seqMap(
+      r.Header, P.all,
+      (header, content) => ({ header, content })
+    )
 });
