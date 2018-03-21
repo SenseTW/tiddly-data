@@ -36,7 +36,7 @@ describe('TiddlyData', () => {
       expect(e.type).to.be.equal('problem-solution:subproblem');
       expect(e.to).to.be.string;
     }
-  })
+  });
 
   it('should create a tiddly default map', () => {
     const w = new D.DefaultMap(defaultMap);
@@ -52,5 +52,35 @@ describe('TiddlyData', () => {
       expect(v).to.have.property('x');
       expect(v).to.have.property('y');
     }
+  });
+
+  describe('TiddlyMap', () => {
+    it('should create an instance', () => {
+      const n = new D.Node(wiki);
+      const nm = { [n.id]: n };
+      const dm = new D.DefaultMap(defaultMap);
+      const tm = new D.TiddlyMap(dm, nm);
+
+      expect(tm.position(n.id).x).to.be.equal(1);
+      expect(tm.position(n.id).y).to.be.equal(1);
+    });
+
+    it('should move a node in the map', () => {
+      const n = new D.Node(wiki);
+      const nm = { [n.id]: n };
+      const dm = new D.DefaultMap(defaultMap);
+      const tm = new D.TiddlyMap(dm, nm);
+
+      tm.moveTo(n.id, { x: 100, y: 100 });
+
+      // should not change the old value
+      expect(dm.nodeMap[n.id].x).to.be.equal(1);
+      expect(dm.nodeMap[n.id].y).to.be.equal(1);
+
+      expect(tm.position(n.id).x).to.be.equal(100);
+      expect(tm.position(n.id).y).to.be.equal(100);
+    });
+
+    // it('should dump the map', () => {});
   })
 });

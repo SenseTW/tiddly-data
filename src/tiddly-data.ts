@@ -1,5 +1,6 @@
 import * as objectAssign from 'object-assign';
 import * as moment from 'moment';
+import { clone } from 'ramda';
 
 const TIME_FORMAT = 'YYYYMMDDHHmmssSSS';
 
@@ -61,5 +62,31 @@ export class DefaultMap extends Wiki {
       console.warn(e);
       this.nodeMap = {};
     }
+  }
+}
+
+export class TiddlyMap {
+  private defaultMap: DefaultMap;
+  private nodeMap: { [key: string]: Node };
+
+  constructor(defaultMap: DefaultMap, nodeMap: { [key: string]: Node }) {
+    this.defaultMap = clone(defaultMap);
+    this.nodeMap = clone(nodeMap);
+  }
+
+  private guardNode(id: string) {
+    if (!this.defaultMap.nodeMap[id]) {
+      throw new Error(`node ${id} not found!`);
+    }
+  }
+
+  public moveTo(id, p: Point = EmptyPoint) {
+    this.guardNode(id);
+    this.defaultMap.nodeMap[id] = p;
+  }
+
+  public position(id): Point {
+    this.guardNode(id);
+    return clone(this.defaultMap.nodeMap[id]);
   }
 }
