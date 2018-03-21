@@ -2,7 +2,7 @@ import * as mocha from 'mocha';
 import { expect } from 'chai';
 import * as D from './tiddly-data';
 import * as P from './parser';
-import { sampleWiki, sampleDefaultMap } from './parser.test';
+import { sampleWiki, sampleDump, sampleDefaultMap } from './parser.test';
 
 // XXX: TiddlyWiki dates are local dates: https://github.com/Jermolene/TiddlyWiki5/issues/280
 const LOCAL_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss.SSS'
@@ -81,6 +81,10 @@ describe('TiddlyData', () => {
       expect(tm.position(n.id).y).to.be.equal(100);
     });
 
-    // it('should dump the map', () => {});
+    it('should dump the map', () => {
+      const w = new D.Wiki(wiki);
+
+      expect(w.toString()).to.be.equal(sampleDump);
+    });
   })
 });

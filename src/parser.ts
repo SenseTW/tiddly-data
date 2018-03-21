@@ -1,5 +1,5 @@
 import * as P from 'parsimmon';
-import { reduceRight, reduce, mergeDeepRight } from 'ramda';
+import { reduceRight, reduce, mergeDeepRight, is } from 'ramda';
 
 // the Wikitext parser
 export const TiddlyFile = P.createLanguage({
@@ -35,3 +35,20 @@ export const TiddlyFile = P.createLanguage({
       (headers, text) => ({ ...headers, text })
     )
 });
+
+export const flattenObject = (o: any): any => {
+  let r = {};
+
+  for (const k in o) {
+    if (is(Object, o[k])) {
+      const flatted = flattenObject(o[k]);
+      for (const l in flatted) {
+        r[`${k}.${l}`] = flatted[l]
+      }
+    } else {
+      r[k] = o[k];
+    }
+  }
+
+  return r;
+};
