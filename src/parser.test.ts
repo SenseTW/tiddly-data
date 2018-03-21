@@ -4,6 +4,7 @@ import * as P from './parser';
 
 export const sampleWiki = `created: 20180314035638346
 modified: 20180315043436460
+tags: 
 title: 缺乏基礎研發人材
 tmap.edges: {"10061a94-1831-4e19-87b1-9e33dc55eb86":{"to":"33c0840e-ebcf-4144-8cbb-9c71c919dfdc","type":"problem-solution:subproblem"}}
 tmap.id: bdd1331f-d8be-4f51-a0b3-47bf66914265

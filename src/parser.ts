@@ -21,9 +21,11 @@ export const TiddlyFile = P.createLanguage({
     ),
   Value: () =>
     P.regexp(/[^\n]*/),
+  OptWhitespace: () =>
+    P.regexp(/[^\S\n]*/),
   Pair: (r) =>
     P.seqMap(
-      r.Key, P.optWhitespace, r.Colon, P.optWhitespace, r.Value,
+      r.Key, r.OptWhitespace, r.Colon, r.OptWhitespace, r.Value,
       (ks: string[], _, __, ___, value) => reduceRight((k, acc) => ({ [k]: acc }), value, ks)
     ),
   Header: (r) =>
