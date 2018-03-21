@@ -29,11 +29,16 @@ export class Node extends Wiki {
   public id: string;
   public edges: { [key: string]: Edge };
 
-  constructor({ tmap: { id = '', edges = '' } = {}, ...rest } = {}) {
+  constructor({ tmap: { id = '', edges = '{}' } = {}, ...rest } = {}) {
     super(rest);
 
     this.id = id;
-    this.edges = JSON.parse(edges);
+    try {
+      this.edges = JSON.parse(edges);
+    } catch (e) {
+      console.warn(e);
+      this.edges = {};
+    }
   }
 }
 
@@ -42,12 +47,19 @@ export type Point = {
   y: number
 };
 
+export const EmptyPoint: Point = { x: 0, y: 0 };
+
 export class DefaultMap extends Wiki {
   public nodeMap: { [key: string]: Point };
 
   constructor({ text = '', ...rest } = {}) {
     super(rest);
 
-    this.nodeMap = JSON.parse(text);
+    try {
+      this.nodeMap = JSON.parse(text);
+    } catch (e) {
+      console.warn(e);
+      this.nodeMap = {};
+    }
   }
 }
