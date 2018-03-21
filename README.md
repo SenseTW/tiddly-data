@@ -2,6 +2,13 @@
 
 Tools for processing wikitext files of TiddlyWiki. Plus more tools for nodes and edges of TiddlyMap.
 
+# Usage
+
+1. Clone this repo
+2. `npm install` and `npm link` under that folder
+3. `npm link tiddly-data` under your TiddlyWiki/TiddlyMap folder
+4. Use the `tiddly-map` command to manipulate your map
+
 # ToDo
 
 * [ ] Model everything
