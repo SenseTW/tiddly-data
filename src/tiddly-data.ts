@@ -139,6 +139,9 @@ export class DefaultMap extends Wiki {
   }
 }
 
+export const TIDDLY_MAP_PREFIX = '$__plugins_felixhayashi_tiddlymap';
+export const TIDDLY_MAP_DEFAULT_MAP_NAME = 'graph_views_Default_map.tid';
+
 export class TiddlyMap {
   private defaultMap: DefaultMap;
   private nodeMap: { [key: string]: Node };
@@ -162,5 +165,18 @@ export class TiddlyMap {
   public position(id): Point {
     this.guardNode(id);
     return clone(this.defaultMap.nodeMap[id]);
+  }
+
+  public toFiles(): { [key: string]: string } {
+    let r: { [key: string]: string } = {};
+
+    r[`${TIDDLY_MAP_PREFIX}_${TIDDLY_MAP_DEFAULT_MAP_NAME}`] = this.defaultMap.toString();
+
+    for (const k in this.nodeMap) {
+      const v = this.nodeMap[k];
+      r[`${v.title || k}.tid`] = v.toString();
+    }
+
+    return r;
   }
 }

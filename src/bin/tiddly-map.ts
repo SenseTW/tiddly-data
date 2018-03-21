@@ -6,8 +6,6 @@ import * as D from '../tiddly-data';
 import * as P from '../parser';
 import { keys } from 'ramda';
 
-const TIDDLY_MAP_PREFIX = '$__plugins_felixhayashi_tiddlymap';
-
 const argv = yargs
   .usage('Usage: $0 <command> [options]')
   .default('directory', 'tiddlers')
@@ -39,7 +37,7 @@ const main = async () => {
   }
 
   // find the default map
-  const default_map_name = `${TIDDLY_MAP_PREFIX}_graph_views_Default_map.tid`;
+  const default_map_name = `${D.TIDDLY_MAP_PREFIX}_${D.TIDDLY_MAP_DEFAULT_MAP_NAME}`;
 
   if (!file_map[default_map_name]) {
     throw new Error('default map not fonud!');
@@ -54,7 +52,9 @@ const main = async () => {
     }
   }
 
-  console.log(default_map);
+  const tiddly_map = new D.TiddlyMap(default_map, node_map);
+
+  console.log(keys(tiddly_map.toFiles()));
 }
 
 main().catch(console.error.bind(console));
