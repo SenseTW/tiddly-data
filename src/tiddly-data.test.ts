@@ -2,7 +2,7 @@ import * as mocha from 'mocha';
 import { expect } from 'chai';
 import * as D from './tiddly-data';
 import * as P from './parser';
-import { sampleWiki, sampleDump, sampleDefaultMap } from './parser.test';
+import { sampleWiki, sampleDefaultMap } from './parser.test';
 
 // XXX: TiddlyWiki dates are local dates: https://github.com/Jermolene/TiddlyWiki5/issues/280
 const LOCAL_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss.SSS'
@@ -24,10 +24,10 @@ describe('TiddlyData', () => {
   it('should dump a wiki', () => {
     const w = new D.Wiki(wiki);
 
-    expect(w.toString()).to.be.equal(sampleDump);
+    expect(w.toString()).to.be.equal(sampleWiki);
   });
 
-  it('should create a tiddly map node', () => {
+  it('should create a map node', () => {
     const w = new D.Node(wiki);
 
     expect(w.type).to.be.equal(CONTENT_TYPE_TIDDLY_WIKI_5);
@@ -47,10 +47,10 @@ describe('TiddlyData', () => {
   it('should dump a map node', () => {
     const w = new D.Node(wiki);
 
-    expect(w.toString()).to.be.equal(sampleDump);
+    expect(w.toString()).to.be.equal(sampleWiki);
   });
 
-  it('should create a tiddly default map', () => {
+  it('should create a default map', () => {
     const w = new D.DefaultMap(defaultMap);
 
     expect(w.type).to.be.equal(CONTENT_TYPE_TIDDLY_WIKI_5);
@@ -64,6 +64,12 @@ describe('TiddlyData', () => {
       expect(v).to.have.property('x');
       expect(v).to.have.property('y');
     }
+  });
+
+  it('should dump a default map', () => {
+    const w = new D.DefaultMap(defaultMap);
+
+    expect(w.toString()).to.be.equal(sampleDefaultMap);
   });
 
   describe('TiddlyMap', () => {
