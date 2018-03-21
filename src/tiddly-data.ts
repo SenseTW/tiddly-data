@@ -5,6 +5,31 @@ import { flattenObject } from './parser';
 
 const TIME_FORMAT = 'YYYYMMDDHHmmssSSS';
 
+const rawToString = ({ text = '', type = '', ...rest } = {}): string => {
+    let s = '';
+
+    const flatted = flattenObject(rest);
+    for (const k in flatted) {
+      const v = flatted[k]
+      s += `${k}: ${v.toString().replace(/\n/g, '')}\n`;
+    }
+
+    // type should be the last value before the text
+    if (type) {
+      s += `type: ${type}\n`;
+    }
+
+    if (text) {
+      if (/\n/.test(text)) {
+        s += '\n' + text;
+      } else {
+        s += `text: ${text}`;
+      }
+    }
+
+    return s;
+};
+
 export class Wiki {
   private keys: string[];
 
@@ -25,44 +50,28 @@ export class Wiki {
     objectAssign(this, rest);
   }
 
-  public toString():string {
-    const { created, modified, text } = this;
-
-    let rest = {};
-    for (const k of this.keys) {
-      if (k === 'created') continue;
-      if (k === 'modified') continue;
-      if (k === 'text') continue;
-      if (is(Function, this[k])) continue;
-      rest[k] = this[k];
-    }
-
-    let s = '';
+  public toObject(): any {
+    const { created, modified } = this;
+    let r: any = {};
 
     if (created) {
-      s += `created: ${this.created.format(TIME_FORMAT)}\n`;
+      r.created = this.created.format(TIME_FORMAT);
     }
 
     if (modified) {
-      s += `modified: ${this.modified.format(TIME_FORMAT)}\n`;
+      r.modified = this.modified.format(TIME_FORMAT);
     }
 
-    const flatted = flattenObject(rest);
-    for (const k in flatted) {
-      const v = flatted[k]
-      s += `${k}: ${v.toString().replace(/\n/g, '')}\n`;
+    for (const k of this.keys) {
+      if (is(Function, this[k])) continue;
+      r[k] = this[k];
     }
 
-    if (text) {
-      const t = text.toString();
-      if (/\n/.test(t)) {
-        s += '\n' + t;
-      } else {
-        s += `text: ${t}`;
-      }
-    }
+    return r;
+  }
 
-    return s;
+  public toString():string {
+    return rawToString(this.toObject());
   }
 }
 
@@ -86,6 +95,18 @@ export class Node extends Wiki {
       this.edges = {};
     }
   }
+
+  public toString(): string {
+    let o = this.toObject();
+
+    o.tmap = {
+      // order matters
+      edges: JSON.stringify(this.edges),
+      id: this.id
+    };
+
+    return rawToString(o);
+  }
 }
 
 export type Point = {
@@ -107,6 +128,14 @@ export class DefaultMap extends Wiki {
       console.warn(e);
       this.nodeMap = {};
     }
+  }
+
+  public toString(): string {
+    let o = this.toObject();
+
+    o.text = JSON.stringify(this.nodeMap, null, 2);
+
+    return rawToString(o);
   }
 }
 

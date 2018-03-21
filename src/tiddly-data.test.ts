@@ -21,6 +21,12 @@ describe('TiddlyData', () => {
     expect(w.modified.format(LOCAL_TIME_FORMAT)).to.be.equal('2018-03-15T04:34:36.460');
   });
 
+  it('should dump a wiki', () => {
+    const w = new D.Wiki(wiki);
+
+    expect(w.toString()).to.be.equal(sampleDump);
+  });
+
   it('should create a tiddly map node', () => {
     const w = new D.Node(wiki);
 
@@ -36,6 +42,12 @@ describe('TiddlyData', () => {
       expect(e.type).to.be.equal('problem-solution:subproblem');
       expect(e.to).to.be.string;
     }
+  });
+
+  it('should dump a map node', () => {
+    const w = new D.Node(wiki);
+
+    expect(w.toString()).to.be.equal(sampleDump);
   });
 
   it('should create a tiddly default map', () => {
@@ -79,12 +91,6 @@ describe('TiddlyData', () => {
 
       expect(tm.position(n.id).x).to.be.equal(100);
       expect(tm.position(n.id).y).to.be.equal(100);
-    });
-
-    it('should dump the map', () => {
-      const w = new D.Wiki(wiki);
-
-      expect(w.toString()).to.be.equal(sampleDump);
     });
   })
 });
