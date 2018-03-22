@@ -96,7 +96,6 @@ const trello = async (argv) => {
     };
 
     for (const card of list.cards) {
-      console.log(card.name);
       const title = P.TrelloCard.Title.tryParse(card.name);
       const raw_card = {
         created: now,
@@ -110,7 +109,7 @@ const trello = async (argv) => {
         text: card.desc
       }
 
-      raw.text += '\n{{' + card.name + '|document-quote}}\n';
+      raw.text += '\n{{' + title.name + '||document-quote}}\n';
 
       const node = new D.Node(raw_card);
       node_map[node.id] = node;
