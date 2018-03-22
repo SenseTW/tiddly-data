@@ -35,7 +35,10 @@ type: text/vnd.tiddlywiki
   }
 }`
 
-const sampleTrelloCardTitle = '【科技工具如何讓新聞擁有更多可能性？】他認為，下個時代的媒體產製流程，將依循著「協作、再利用、封裝、內容管理」四個步驟，而每個組織都應該發展出有效率的資料、內容、工具管理系統。 #嘿 #嘿嘿嘿';
+const sampleTrelloCardTitle = '【科技工具如何讓新聞擁有更多可能性？】他認為 #嘿 #嘿嘿嘿';
+const sampleCleanCardTitle = '【科技工具如何讓新聞擁有更多可能性？】他認為';
+const sampleMissingCardTitle = '他認為 #嘿 #嘿嘿嘿';
+const sampleNewlineCardTitle = '他\n認為 #嘿 #嘿嘿嘿';
 
 describe('Parser', () => {
   it('should parse a Wikitext file', () => {
@@ -55,9 +58,33 @@ describe('Parser', () => {
     const c = P.TrelloCard.Title.tryParse(sampleTrelloCardTitle);
 
     expect(c.name).to.equal('科技工具如何讓新聞擁有更多可能性？');
-    expect(c.preview).to.equal('他認為，下個時代的媒體產製流程，將依循著「協作、再利用、封裝、內容管理」四個步驟，而每個組織都應該發展出有效率的資料、內容、工具管理系統。');
+    expect(c.preview).to.equal('他認為');
     expect(c.tags).to.deep.equal(['嘿', '嘿嘿嘿']);
-  })
+  });
+
+  it('should parse a Trello card title without tags', () => {
+    const c = P.TrelloCard.Title.tryParse(sampleCleanCardTitle);
+
+    expect(c.name).to.equal('科技工具如何讓新聞擁有更多可能性？');
+    expect(c.preview).to.equal('他認為');
+    expect(c.tags).to.deep.equal([]);
+  });
+
+  it('should parse a Trello card title without a name', () => {
+    const c = P.TrelloCard.Title.tryParse(sampleMissingCardTitle);
+
+    expect(c.name).to.equal('他認為');
+    expect(c.preview).to.equal('他認為');
+    expect(c.tags).to.deep.equal(['嘿', '嘿嘿嘿']);
+  });
+
+  it('should parse a Trello card title with newline characters', () => {
+    const c = P.TrelloCard.Title.tryParse(sampleNewlineCardTitle);
+
+    expect(c.name).to.equal('他認為');
+    expect(c.preview).to.equal('他認為');
+    expect(c.tags).to.deep.equal(['嘿', '嘿嘿嘿']);
+  });
 });
 
 describe('Helpers', () => {

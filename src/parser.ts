@@ -50,13 +50,28 @@ export const TrelloCard = P.createLanguage({
     ),
   Name: (r) =>
     P.seqMap(
-      P.string('【'), r.OptWhitespace, r.Symbol, r.OptWhitespace, P.string('】'),
-      (_, __, name, ___, ____) => name
+      P.string('【'), r.OptWhitespace, r.Symbol.trim(P.optWhitespace).many(), r.OptWhitespace, P.string('】'),
+      (_, __, ns, ___, ____) => ns.join(' ')
     ),
   Title: (r) =>
     P.seqMap(
-      r.Name, r.OptWhitespace, r.Symbol, r.OptWhitespace, r.Tag.trim(r.OptWhitespace).many(),
-      (name, _, preview, __, tags) => ({ name, preview, tags })
+      r.Name.trim(r.OptWhitespace).many(),
+      r.OptWhitespace,
+      r.Symbol.trim(P.optWhitespace).many(),
+      r.OptWhitespace,
+      r.Tag.trim(r.OptWhitespace).many(),
+      (ns, _, ps, __, tags) => {
+        const preview = ps.join('');
+        let name;
+
+        if (ns.length === 0) {
+          name = preview;
+        } else {
+          name = ns[0];
+        }
+
+        return { name, preview, tags }
+      }
     )
 });
 

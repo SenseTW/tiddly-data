@@ -96,11 +96,13 @@ const trello = async (argv) => {
     };
 
     for (const card of list.cards) {
+      console.log(card.name);
+      const title = P.TrelloCard.Title.tryParse(card.name);
       const raw_card = {
         created: now,
         modified: now,
-        title: card.name,
-        tags: '',
+        title: title.name,
+        tags: title.tags.join(' '),
         tmap: {
           id: uuidv5(card.id, NAMESPACE)
         },
