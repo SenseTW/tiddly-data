@@ -38,6 +38,28 @@ export const TiddlyFile = P.createLanguage({
     )
 });
 
+export const TrelloCard = P.createLanguage({
+  OptWhitespace: () =>
+    P.regexp(/[^\S\n]*/),
+  Symbol: (r) =>
+    P.regexp(/[^【】#\s]+/),
+  Tag: (r) =>
+    P.seqMap(
+      P.string('#'), r.Symbol,
+      (_, tag) => tag
+    ),
+  Name: (r) =>
+    P.seqMap(
+      P.string('【'), r.OptWhitespace, r.Symbol, r.OptWhitespace, P.string('】'),
+      (_, __, name, ___, ____) => name
+    ),
+  Title: (r) =>
+    P.seqMap(
+      r.Name, r.OptWhitespace, r.Symbol, r.OptWhitespace, r.Tag.trim(r.OptWhitespace).many(),
+      (name, _, preview, __, tags) => ({ name, preview, tags })
+    )
+});
+
 export const flattenObject = (o: any): any => {
   let r = {};
 
