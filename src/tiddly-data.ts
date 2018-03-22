@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import { keys, clone, is } from 'ramda';
 import { flattenObject } from './parser';
 
-const TIME_FORMAT = 'YYYYMMDDHHmmssSSS';
+export const TIME_FORMAT = 'YYYYMMDDHHmmssSSS';
 
 const rawToString = ({ text = '', type = '', ...rest } = {}): string => {
     let s = '';
@@ -174,7 +174,9 @@ export class TiddlyMap {
 
     for (const k in this.nodeMap) {
       const v = this.nodeMap[k];
-      r[`${v.title || k}.tid`] = v.toString();
+      // escape slashes
+      const filename = (v.title || k).replace(/\//g, '%2F');
+      r[`${filename}.tid`] = v.toString();
     }
 
     return r;

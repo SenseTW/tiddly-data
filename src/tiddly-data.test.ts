@@ -98,5 +98,7 @@ describe('TiddlyData', () => {
       expect(tm.position(n.id).x).to.be.equal(100);
       expect(tm.position(n.id).y).to.be.equal(100);
     });
+
+    // it('should escape salshes in filepath', () => {})
   })
 });

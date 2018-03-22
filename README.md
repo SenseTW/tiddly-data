@@ -8,6 +8,7 @@ Tools for processing wikitext files of TiddlyWiki. Plus more tools for nodes and
 2. `npm install` and `npm link` under that folder
 3. `npm link tiddly-data` under your TiddlyWiki/TiddlyMap folder
 4. Use the `tiddly-map` command to manipulate your map
+  * For example, ```npm bin``/tiddly-map trello -b Lo01hfDB -d temp` will fetch lists and cards from Trello board Lo01hfDB and save as tid files in `./temp/`.
 
 # ToDo
 
