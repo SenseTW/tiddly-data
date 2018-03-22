@@ -88,25 +88,33 @@ describe('Parsers', () => {
     expect(c.tags).to.deep.equal(['嘿', '嘿嘿嘿']);
   });
 
-  it('should parse the Filter expression', () => {
-    const fs: P.Filter.Expression[] = P.TiddlyFilter.Expression.tryParse(sampleFilter);
+  describe('TiddlyWiki Filter', () => {
+    it('should create a filter from a string', () => {
+      const fs = P.Filter.fromString(sampleFilter);
 
-    expect(fs).to.be.an.instanceOf(Array);
-    for (const f of fs) {
-      expect(f.prefix).to.be.oneOf([undefined, '+', '-']);
-      expect(f.run).to.be.an.instanceOf(Array);
-      for (const step of f.run) {
-        if (typeof step !== 'string') {
-          expect(step.negate).to.be.oneOf([true, false]);
-          expect(step.operator).to.be.string;
-          expect(step.suffix).to.be.string;
-          expect(step).to.have.property('parameter');
-          expect(step.parameter.type).to.be.oneOf(['hard', 'indirect', 'variable']);
-          expect(step.parameter.value).to.be.string;
+      expect(fs).to.be.an.instanceOf(Array);
+      for (const f of fs) {
+        expect(f.prefix).to.be.oneOf([undefined, '+', '-']);
+        expect(f.run).to.be.an.instanceOf(Array);
+        for (const step of f.run) {
+          if (typeof step !== 'string') {
+            expect(step.negate).to.be.oneOf([true, false]);
+            expect(step.operator).to.be.string;
+            expect(step.suffix).to.be.string;
+            expect(step).to.have.property('parameter');
+            expect(step.parameter.type).to.be.oneOf(['hard', 'indirect', 'variable']);
+            expect(step.parameter.value).to.be.string;
+          }
         }
       }
-    }
-  })
+    });
+
+    it('should reform a filter to a string', () => {
+      const fs = P.Filter.fromString(sampleFilter);
+
+      expect(P.Filter.toString(fs)).to.be.equal(sampleFilter);
+    });
+  });
 });
 
 describe('Helpers', () => {

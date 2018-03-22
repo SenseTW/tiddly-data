@@ -38,33 +38,8 @@ export const TiddlyFile = P.createLanguage({
     )
 });
 
-export namespace Filter {
-  export interface Parameter {
-    type: 'hard' | 'indirect' | 'variable';
-    value: string;
-  }
-
-  export type Operator = string;
-
-  export type Suffix = string;
-
-  export interface Step {
-    negate: boolean;
-    operator?: Operator;
-    suffix?: Suffix;
-    parameter: Parameter;
-  }
-
-  export type Run = (Step[] | string);
-
-  export interface Expression {
-    prefix?: '+' | '-';
-    run: Run;
-  }
-}
-
 // spec: https://tiddlywiki.com/static/Filters.html
-export const TiddlyFilter = P.createLanguage({
+const TiddlyFilter = P.createLanguage({
   Parameter: (r) =>
     P.alt(
       P.seqMap(
@@ -209,6 +184,78 @@ export const TiddlyFilter = P.createLanguage({
       (_, [prefix], run) => ({ prefix, run } as Filter.Expression)
     ).many()
 });
+
+export namespace Filter {
+  export interface Parameter {
+    type: 'hard' | 'indirect' | 'variable';
+    value: string;
+  }
+
+  export type Operator = string;
+
+  export type Suffix = string;
+
+  export interface Step {
+    negate: boolean;
+    operator?: Operator;
+    suffix?: Suffix;
+    parameter: Parameter;
+  }
+
+  export type Run = (Step[] | string);
+
+  export interface Expression {
+    prefix?: '+' | '-';
+    run: Run;
+  }
+
+  export const fromString = (s: string): Expression[] =>
+    TiddlyFilter.Expression.tryParse(s);
+
+  export const toString = (es: Expression[]): string => {
+    let rs = [];
+    let r = '';
+
+    for (const e of es) {
+      let r = '';
+
+      if (e.prefix) r += e.prefix;
+      if (typeof e.run === 'string') {
+        if (!/\s/.test(e.run))
+          r += e.run;
+        else if (/"/.test(e.run))
+          r += `'${e.run}'`;
+        else
+          r += `"${e.run}"`;
+      } else {
+        for (const step of e.run) {
+          r += '[';
+          if (step.negate) r += '!';
+          if (step.operator) r += step.operator;
+          if (step.suffix) r += `:${step.suffix}`;
+          switch (step.parameter.type) {
+            case 'hard':
+              r += `[${step.parameter.value}]`;
+              break;
+            case 'indirect':
+              r += `{${step.parameter.value}}`;
+              break;
+            case 'variable':
+              r += `<${step.parameter.value}>`;
+              break;
+            default:
+              throw new Error(`unknown parameter type: ${step.parameter.type}`);
+          }
+          r += ']';
+        }
+      }
+
+      rs.push(r);
+    }
+
+    return rs.join(' ');
+  }
+}
 
 export const TrelloCard = P.createLanguage({
   OptWhitespace: () =>
