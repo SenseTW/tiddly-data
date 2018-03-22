@@ -8,6 +8,7 @@ import * as uuidv5 from 'uuid/v5';
 import { keys } from 'ramda';
 import * as D from '../tiddly-data';
 import * as P from '../parser';
+import * as T from '../trello';
 
 const NAMESPACE = '2cb5cecd-1bab-4a9a-82f9-a1ece125cfc5';
 const API_LOCATION = 'http://api.trello.com/1';
@@ -96,7 +97,7 @@ const trello = async (argv) => {
     };
 
     for (const card of list.cards) {
-      const title = P.TrelloCard.Title.tryParse(card.name);
+      const title = T.Title.fromString(card.name);
       const raw_card = {
         created: now,
         modified: now,

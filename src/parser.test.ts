@@ -55,38 +55,6 @@ describe('Parsers', () => {
     expect(w.type).to.be.equal('text/vnd.tiddlywiki');
     expect(w.text).to.be.string;
   });
-
-  it('should parse a Trello card title', () => {
-    const c = P.TrelloCard.Title.tryParse(sampleTrelloCardTitle);
-
-    expect(c.name).to.equal('科技工具如何讓新聞擁有更多可能性？');
-    expect(c.preview).to.equal('他認為');
-    expect(c.tags).to.deep.equal(['嘿', '嘿嘿嘿']);
-  });
-
-  it('should parse a Trello card title without tags', () => {
-    const c = P.TrelloCard.Title.tryParse(sampleCleanCardTitle);
-
-    expect(c.name).to.equal('科技工具如何讓新聞擁有更多可能性？');
-    expect(c.preview).to.equal('他認為');
-    expect(c.tags).to.deep.equal([]);
-  });
-
-  it('should parse a Trello card title without a name', () => {
-    const c = P.TrelloCard.Title.tryParse(sampleMissingCardTitle);
-
-    expect(c.name).to.equal('他認為');
-    expect(c.preview).to.equal('他認為');
-    expect(c.tags).to.deep.equal(['嘿', '嘿嘿嘿']);
-  });
-
-  it('should parse a Trello card title with newline characters', () => {
-    const c = P.TrelloCard.Title.tryParse(sampleNewlineCardTitle);
-
-    expect(c.name).to.equal('他認為');
-    expect(c.preview).to.equal('他認為');
-    expect(c.tags).to.deep.equal(['嘿', '嘿嘿嘿']);
-  });
 });
 
 describe('Helpers', () => {
