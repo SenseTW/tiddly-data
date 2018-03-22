@@ -89,15 +89,21 @@ describe('Parsers', () => {
   });
 
   it('should parse the Filter expression', () => {
-    const fs = P.TiddlyFilter.Expression.tryParse(sampleFilter);
+    const fs: P.Filter.Expression[] = P.TiddlyFilter.Expression.tryParse(sampleFilter);
 
+    expect(fs).to.be.an.instanceOf(Array);
     for (const f of fs) {
       expect(f.prefix).to.be.oneOf([undefined, '+', '-']);
+      expect(f.run).to.be.an.instanceOf(Array);
       for (const step of f.run) {
-        expect(step.negate).to.be.oneOf([true, false]);
-        expect(step.operator).to.be.string;
-        expect(step.suffix).to.be.string;
-        expect(step.parameter).to.be.string;
+        if (typeof step !== 'string') {
+          expect(step.negate).to.be.oneOf([true, false]);
+          expect(step.operator).to.be.string;
+          expect(step.suffix).to.be.string;
+          expect(step).to.have.property('parameter');
+          expect(step.parameter.type).to.be.oneOf(['hard', 'indirect', 'variable']);
+          expect(step.parameter.value).to.be.string;
+        }
       }
     }
   })

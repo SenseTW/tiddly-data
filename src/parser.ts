@@ -38,21 +38,46 @@ export const TiddlyFile = P.createLanguage({
     )
 });
 
+export namespace Filter {
+  export interface Parameter {
+    type: 'hard' | 'indirect' | 'variable';
+    value: string;
+  }
+
+  export type Operator = string;
+
+  export type Suffix = string;
+
+  export interface Step {
+    negate: boolean;
+    operator?: Operator;
+    suffix?: Suffix;
+    parameter: Parameter;
+  }
+
+  export type Run = (Step[] | string);
+
+  export interface Expression {
+    prefix?: '+' | '-';
+    run: Run;
+  }
+}
+
 // spec: https://tiddlywiki.com/static/Filters.html
 export const TiddlyFilter = P.createLanguage({
   Parameter: (r) =>
     P.alt(
       P.seqMap(
         P.string('['), P.regexp(/[^\]]+/), P.string(']'),
-        (_, p, __) => p
+        (_, value, __): Filter.Parameter => ({ type: 'hard', value })
       ),
       P.seqMap(
         P.string('{'), P.regexp(/[^}]+/), P.string('}'),
-        (_, p, __) => p
+        (_, value, __): Filter.Parameter => ({ type: 'indirect', value })
       ),
       P.seqMap(
         P.string('<'), P.regexp(/[^>]+/), P.string('>'),
-        (_, p, __) => p
+        (_, value, __): Filter.Parameter => ({ type: 'variable', value })
       ),
     ),
   Operator: (r) =>
@@ -160,13 +185,13 @@ export const TiddlyFilter = P.createLanguage({
         (operator, [suffix]) => ({ operator, suffix })
       ).atMost(1).map(([x]) => [x || { operator: undefined, suffix: undefined }]),
       r.Parameter,
-      (negate, [{ operator, suffix }], parameter) => ({ negate, operator, suffix, parameter })
+      (negate, [{ operator, suffix }], parameter): Filter.Step => ({ negate, operator, suffix, parameter })
     ),
   Run: (r) =>
     P.alt(
       P.seqMap(
         P.string('['), r.Step.atLeast(1), P.string(']'),
-        (_, steps, __) => steps
+        (_, steps, __): Filter.Step[] => steps
       ),
       P.seqMap(
         P.string('"'), P.regexp(/[^"]*/), P.string('"'),
@@ -181,7 +206,7 @@ export const TiddlyFilter = P.createLanguage({
   Expression: (r) =>
     P.seqMap(
       P.optWhitespace, P.oneOf('+-').atMost(1), r.Run,
-      (_, [prefix], run) => ({ prefix, run })
+      (_, [prefix], run) => ({ prefix, run } as Filter.Expression)
     ).many()
 });
 
