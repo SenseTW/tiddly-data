@@ -40,7 +40,9 @@ const sampleCleanCardTitle = '【科技工具如何讓新聞擁有更多可能�
 const sampleMissingCardTitle = '他認為 #嘿 #嘿嘿嘿';
 const sampleNewlineCardTitle = '他\n認為 #嘿 #嘿嘿嘿';
 
-describe('Parser', () => {
+const sampleFilter = '[!field:tmap.id[53ea5b24-9c03-4da9-8f06-4bcfcbd7765b]] -[field:tmap.id[33c0840e-ebcf-4144-8cbb-9c71c919dfdc]]';
+
+describe('Parsers', () => {
   it('should parse a Wikitext file', () => {
     const w = P.TiddlyFile.File.tryParse(sampleWiki);
 
@@ -85,6 +87,20 @@ describe('Parser', () => {
     expect(c.preview).to.equal('他認為');
     expect(c.tags).to.deep.equal(['嘿', '嘿嘿嘿']);
   });
+
+  it('should parse the Filter expression', () => {
+    const fs = P.TiddlyFilter.Expression.tryParse(sampleFilter);
+
+    for (const f of fs) {
+      expect(f.prefix).to.be.oneOf([undefined, '+', '-']);
+      for (const step of f.run) {
+        expect(step.negate).to.be.oneOf([true, false]);
+        expect(step.operator).to.be.string;
+        expect(step.suffix).to.be.string;
+        expect(step.parameter).to.be.string;
+      }
+    }
+  })
 });
 
 describe('Helpers', () => {
