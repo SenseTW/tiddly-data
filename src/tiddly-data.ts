@@ -142,12 +142,37 @@ export class DefaultMap extends Wiki {
 export const TIDDLY_MAP_PREFIX = '$__plugins_felixhayashi_tiddlymap';
 export const TIDDLY_MAP_DEFAULT_MAP_NAME = 'graph_views_Default_map.tid';
 
+export class DefaultFilter extends Wiki {
+  public nodeMap: { [key: string]: Point };
+
+  constructor({ text = '{}', ...rest } = {}) {
+    super(rest);
+
+    try {
+      this.nodeMap = JSON.parse(text);
+    } catch (e) {
+      console.warn(e);
+      this.nodeMap = {};
+    }
+  }
+
+  public toString(): string {
+    let o = this.toObject();
+    o.filter = Object.keys(this.nodeMap).map(id => `[field:tmap.id[${id}]]`).join(' ');
+    return rawToString(o);
+  }
+}
+
+export const TIDDLY_MAP_DEFAULT_FILTER_NAME = 'graph_views_Default_filter_nodes.tid';
+
 export class TiddlyMap {
   private defaultMap: DefaultMap;
+  private defaultFilter: DefaultFilter;
   private nodeMap: { [key: string]: Node };
 
-  constructor(defaultMap: DefaultMap, nodeMap: { [key: string]: Node }) {
+  constructor(defaultMap: DefaultMap, defaultFilter: DefaultFilter, nodeMap: { [key: string]: Node }) {
     this.defaultMap = clone(defaultMap);
+    this.defaultFilter = clone(defaultFilter);
     this.nodeMap = clone(nodeMap);
   }
 
@@ -171,6 +196,7 @@ export class TiddlyMap {
     let r: { [key: string]: string } = {};
 
     r[`${TIDDLY_MAP_PREFIX}_${TIDDLY_MAP_DEFAULT_MAP_NAME}`] = this.defaultMap.toString();
+    r[`${TIDDLY_MAP_PREFIX}_${TIDDLY_MAP_DEFAULT_FILTER_NAME}`] = this.defaultFilter.toString();
 
     for (const k in this.nodeMap) {
       const v = this.nodeMap[k];

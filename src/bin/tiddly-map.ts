@@ -17,7 +17,7 @@ const main = async (argv) => {
   // states
   const file_map = {};
   const node_map: { [key: string]: D.Node } = {};
-  let default_map
+  let default_map, default_filter;
 
   const dir_path = path.resolve(argv.directory);
   const files = await readdir(dir_path);
@@ -45,6 +45,7 @@ const main = async (argv) => {
   }
 
   default_map = new D.DefaultMap(file_map[default_map_name])
+  default_filter = new D.DefaultFilter({})
 
   // check if every tmap exists
   for (const k in default_map.nodeMap) {
@@ -53,7 +54,7 @@ const main = async (argv) => {
     }
   }
 
-  const tiddly_map = new D.TiddlyMap(default_map, node_map);
+  const tiddly_map = new D.TiddlyMap(default_map, default_filter, node_map);
 
   console.log(keys(tiddly_map.toFiles()));
 }
@@ -126,10 +127,19 @@ const trello = async (argv) => {
     modified: now,
     title: '$:/plugins/felixhayashi/tiddlymap/graph/views/Default/map',
     type: 'text/vnd.tiddlywiki',
+    filter: '',
     text: `\n${JSON.stringify(position_map, null, 2)}`
   };
 
-  const tw = new D.TiddlyMap(new D.DefaultMap(default_map), node_map);
+  const default_filter = {
+    created: now,
+    modified: now,
+    title: '$:/plugins/felixhayashi/tiddlymap/graph/views/Default/filter/nodes',
+    type: 'text/vnd.tiddlywiki',
+    text: `\n${JSON.stringify(position_map, null, 2)}`
+  }
+
+  const tw = new D.TiddlyMap(new D.DefaultMap(default_map), new D.DefaultFilter(default_filter), node_map);
 
   const files = tw.toFiles();
   console.log(`fetch board ${argv.board} to ${argv.directory}/`);
