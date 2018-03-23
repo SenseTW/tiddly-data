@@ -11,6 +11,7 @@ const rawToString = ({ text = '', type = '', ...rest } = {}): string => {
     const flatted = flattenObject(rest);
     for (const k in flatted) {
       const v = flatted[k]
+      if (v === undefined) continue;
       s += `${k}: ${v.toString().replace(/\n/g, '')}\n`;
     }
 

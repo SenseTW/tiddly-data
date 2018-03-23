@@ -67,6 +67,12 @@ const getLabel = (card) => {
   return '其他';
 }
 
+const template_map = {
+  '政府與研究報告': 'document-quote',
+  '外部意見': 'opinion-quote',
+  '其他': 'document-quote'
+}
+
 const trello = async (argv) => {
   const now = momnet().format(D.TIME_FORMAT);
 
@@ -91,6 +97,14 @@ const trello = async (argv) => {
 
   const { data: cards } = await axios.get(`${API_LOCATION}/boards/${argv.board}/cards`);
   for (const card of cards) {
+    console.log('get source for card ' + card.shortUrl);
+    const { data: attachments } = await axios.get(`${API_LOCATION}/cards/${card.id}/attachments`);
+    const [a] = attachments;
+
+    if (a && a.url) {
+      card.source = a.url;
+    }
+
     const l = getLabel(card);
     list_map[card.idList].cards[l].push(card);
     card_map[card.id] = card;
@@ -110,17 +124,23 @@ const trello = async (argv) => {
       text: ''
     };
 
-    for (const label of ['政府與研究報告', '外部意見', '其他']) {
+    for (const label of keys(template_map)) {
       if (list.cards[label].length) {
         raw.text += `! ${label}\n\n`;
       }
 
       for (const card of list.cards[label]) {
+        // parse the card name to extract filename, comment preview and tags
         const title = T.Title.fromString(card.name);
+
+        // remove '|' from the title for TiddlyWiki transclusion
+        const name = '【' + title.name.replace(/\|/g, ' ') + '】' + title.preview;
+
         const raw_card = {
           created: now,
           modified: now,
-          title: title.name.replace(/\|/g, ''),
+          title: name,
+          source: card.source,
           tags: title.tags.join(' '),
           tmap: {
             id: P.idFrom(card.id)
@@ -129,7 +149,10 @@ const trello = async (argv) => {
           text: card.desc
         }
 
-        raw.text += '\n{{' + title.name.replace(/\|/g, '') + '||document-quote}}\n';
+        // append the card link to the list node
+        raw.text += '\n{{' + raw_card.title;
+        if (template_map[label]) raw.text += '||' + template_map[label];
+        raw.text += '}}\n';
 
         const node = new D.Node(raw_card);
         node_map[node.id] = node;
