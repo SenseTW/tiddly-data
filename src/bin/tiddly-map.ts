@@ -10,7 +10,6 @@ import * as D from '../tiddly-data';
 import * as P from '../parser';
 import * as T from '../trello';
 
-const NAMESPACE = '2cb5cecd-1bab-4a9a-82f9-a1ece125cfc5';
 const API_LOCATION = 'http://api.trello.com/1';
 
 const main = async (argv) => {
@@ -59,6 +58,15 @@ const main = async (argv) => {
   console.log(keys(tiddly_map.toFiles()));
 }
 
+const getLabel = (card) => {
+  for (const label of card.labels) {
+    if (label.name === '政府與研究報告' || label.name === '外部意見') {
+      return label.name;
+    }
+  }
+  return '其他';
+}
+
 const trello = async (argv) => {
   const now = momnet().format(D.TIME_FORMAT);
 
@@ -71,7 +79,11 @@ const trello = async (argv) => {
   const { data: lists } = await axios.get(`${API_LOCATION}/boards/${argv.board}/lists`);
   let i = 0;
   for (const list of lists) {
-    list.cards = [];
+    list.cards = {
+      '政府與研究報告': [],
+      '外部意見': [],
+      '其他': []
+    };
     list.position = { x: 20, y: 20 + 32 * i };
     list_map[list.id] = list;
     i++;
@@ -79,7 +91,8 @@ const trello = async (argv) => {
 
   const { data: cards } = await axios.get(`${API_LOCATION}/boards/${argv.board}/cards`);
   for (const card of cards) {
-    list_map[card.idList].cards.push(card);
+    const l = getLabel(card);
+    list_map[card.idList].cards[l].push(card);
     card_map[card.id] = card;
   }
 
@@ -91,30 +104,36 @@ const trello = async (argv) => {
       title: list.name,
       tags: '',
       tmap: {
-        id: uuidv5(list.id, NAMESPACE)
+        id: P.idFrom(list.id)
       },
       type: 'text/vnd.tiddlywiki',
       text: ''
     };
 
-    for (const card of list.cards) {
-      const title = T.Title.fromString(card.name);
-      const raw_card = {
-        created: now,
-        modified: now,
-        title: title.name,
-        tags: title.tags.join(' '),
-        tmap: {
-          id: uuidv5(card.id, NAMESPACE)
-        },
-        type: 'text/vnd.tiddlywiki',
-        text: card.desc
+    for (const label of ['政府與研究報告', '外部意見', '其他']) {
+      if (list.cards[label].length) {
+        raw.text += `! ${label}\n\n`;
       }
 
-      raw.text += '\n{{' + title.name + '||document-quote}}\n';
+      for (const card of list.cards[label]) {
+        const title = T.Title.fromString(card.name);
+        const raw_card = {
+          created: now,
+          modified: now,
+          title: title.name.replace(/\|/g, ''),
+          tags: title.tags.join(' '),
+          tmap: {
+            id: P.idFrom(card.id)
+          },
+          type: 'text/vnd.tiddlywiki',
+          text: card.desc
+        }
 
-      const node = new D.Node(raw_card);
-      node_map[node.id] = node;
+        raw.text += '\n{{' + title.name.replace(/\|/g, '') + '||document-quote}}\n';
+
+        const node = new D.Node(raw_card);
+        node_map[node.id] = node;
+      }
     }
 
     const node = new D.Node(raw);

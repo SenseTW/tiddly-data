@@ -1,7 +1,7 @@
 import * as objectAssign from 'object-assign';
 import * as moment from 'moment';
 import { keys, clone, is } from 'ramda';
-import { flattenObject } from './parser';
+import { idFrom, flattenObject } from './parser';
 
 export const TIME_FORMAT = 'YYYYMMDDHHmmssSSS';
 

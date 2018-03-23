@@ -1,5 +1,6 @@
 import * as P from 'parsimmon';
 import { reduceRight, reduce, mergeDeepRight, is } from 'ramda';
+import * as uuidv5 from 'uuid/v5';
 
 // the Wikitext parser
 export const TiddlyFile = P.createLanguage({
@@ -38,6 +39,7 @@ export const TiddlyFile = P.createLanguage({
     )
 });
 
+// XXX: should move helpers elsewhere
 export const flattenObject = (o: any): any => {
   let r = {};
 
@@ -54,3 +56,7 @@ export const flattenObject = (o: any): any => {
 
   return r;
 };
+
+const NAMESPACE = '2cb5cecd-1bab-4a9a-82f9-a1ece125cfc5';
+
+export const idFrom = (s) => uuidv5(s, NAMESPACE);
