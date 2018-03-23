@@ -119,6 +119,7 @@ const trello = async (argv) => {
 
     const node = new D.Node(raw);
     position_map[node.id] = list.position;
+    list_map[node.id] = node;
     node_map[node.id] = node;
   }
 
@@ -136,7 +137,7 @@ const trello = async (argv) => {
     modified: now,
     title: '$:/plugins/felixhayashi/tiddlymap/graph/views/Default/filter/nodes',
     type: 'text/vnd.tiddlywiki',
-    text: `\n${JSON.stringify(position_map, null, 2)}`
+    text: `\n${JSON.stringify(list_map, null, 2)}`
   }
 
   const tw = new D.TiddlyMap(new D.DefaultMap(default_map), new D.DefaultFilter(default_filter), node_map);

@@ -158,7 +158,11 @@ export class DefaultFilter extends Wiki {
 
   public toString(): string {
     let o = this.toObject();
-    o.filter = Object.keys(this.nodeMap).map(id => `[field:tmap.id[${id}]]`).join(' ');
+    o.filter = Object.keys(this.nodeMap)
+        .filter(id => this.nodeMap[id]['title'])
+        .filter(id => this.nodeMap[id]['title'].search('Inbox -') != 0)
+        .map(id => `[field:tmap.id[${id}]]`)
+        .join(' ');
     return rawToString(o);
   }
 }
