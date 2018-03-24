@@ -12,13 +12,13 @@ import * as T from '../trello';
 
 const API_LOCATION = 'http://api.trello.com/1';
 
-const main = async (argv) => {
+const createTiddlyMapFromDirectory = async (directory: string) => {
   // states
   const file_map = {};
   const node_map: { [key: string]: D.Node } = {};
   let default_map, default_filter;
 
-  const dir_path = path.resolve(argv.directory);
+  const dir_path = path.resolve(directory);
   const files = await readdir(dir_path);
 
   // read all tid files from the target directory
@@ -38,13 +38,18 @@ const main = async (argv) => {
 
   // find the default map
   const default_map_name = `${D.TIDDLY_MAP_PREFIX}_${D.TIDDLY_MAP_DEFAULT_MAP_NAME}`;
+  const default_filter_name = `${D.TIDDLY_MAP_PREFIX}_${D.TIDDLY_MAP_DEFAULT_FILTER_NAME}`;
 
   if (!file_map[default_map_name]) {
     throw new Error('default map not fonud!');
   }
 
-  default_map = new D.DefaultMap(file_map[default_map_name])
-  default_filter = new D.DefaultFilter({})
+  if (!file_map[default_filter_name]) {
+    throw new Error('default filter not found!');
+  }
+
+  default_map = new D.DefaultMap(file_map[default_map_name]);
+  default_filter = new D.DefaultFilter2(file_map[default_filter_name]);
 
   // check if every tmap exists
   for (const k in default_map.nodeMap) {
@@ -55,7 +60,12 @@ const main = async (argv) => {
 
   const tiddly_map = new D.TiddlyMap(default_map, default_filter, node_map);
 
-  console.log(keys(tiddly_map.toFiles()));
+  return tiddly_map;
+}
+
+const main = async (argv) => {
+  const tm = await createTiddlyMapFromDirectory(argv.directory);
+  console.log(JSON.stringify(tm.toFiles(), null, 2));
 }
 
 const getLabel = (card) => {

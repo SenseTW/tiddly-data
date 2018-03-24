@@ -1,7 +1,8 @@
 import * as objectAssign from 'object-assign';
 import * as moment from 'moment';
-import { keys, clone, is } from 'ramda';
+import { keys, clone, is, find } from 'ramda';
 import { idFrom, flattenObject } from './parser';
+import * as F from './tiddly-filter';
 
 export const TIME_FORMAT = 'YYYYMMDDHHmmssSSS';
 
@@ -142,6 +143,7 @@ export class DefaultMap extends Wiki {
 
 export const TIDDLY_MAP_PREFIX = '$__plugins_felixhayashi_tiddlymap';
 export const TIDDLY_MAP_DEFAULT_MAP_NAME = 'graph_views_Default_map.tid';
+export const TIDDLY_MAP_DEFAULT_FILTER_NAME = 'graph_views_Default_filter_nodes.tid';
 
 export class DefaultFilter extends Wiki {
   public nodeMap: { [key: string]: Point };
@@ -168,7 +170,54 @@ export class DefaultFilter extends Wiki {
   }
 }
 
-export const TIDDLY_MAP_DEFAULT_FILTER_NAME = 'graph_views_Default_filter_nodes.tid';
+export class DefaultFilter2 extends Wiki {
+  private filter: F.Expression[];
+
+  constructor({ filter =  '', ...rest }) {
+    super(rest);
+
+    try {
+      this.filter = F.fromString(filter);
+    } catch (e) {
+      console.warn(e);
+      this.filter = [];
+    }
+  }
+
+  public toString(): string {
+    let o = this.toObject();
+    o.filter = F.toString(this.filter);
+    return rawToString(o);
+  }
+
+  public push(id: string) {
+    // check if the id is already exist
+    const old = find(
+      ({ run }) => {
+        if (typeof run === 'string') return false;
+        const [{ parameter: { value }}] = run;
+        return value === id
+      },
+      this.filter
+    );
+
+    if (old) return;
+
+    const e: F.Expression = {
+      run: [{
+        negate: false,
+        operator: 'field',
+        suffix: 'tmap.id',
+        parameter: {
+          type: 'hard',
+          value: id
+        }
+      }]
+    }
+
+    this.filter.push(e);
+  }
+}
 
 export class TiddlyMap {
   private defaultMap: DefaultMap;
@@ -187,7 +236,7 @@ export class TiddlyMap {
     }
   }
 
-  public moveTo(id, p: Point = EmptyPoint) {
+  public moveTo(id: string, p: Point = EmptyPoint) {
     this.guardNode(id);
     this.defaultMap.nodeMap[id] = p;
   }
@@ -195,6 +244,19 @@ export class TiddlyMap {
   public position(id): Point {
     this.guardNode(id);
     return clone(this.defaultMap.nodeMap[id]);
+  }
+
+  public add(id: string, p:Point = EmptyPoint) {
+    if (this.defaultMap.nodeMap[id]) {
+      throw new Error(`node ${id} is already there!`);
+    }
+    this.defaultMap.nodeMap[id] = p;
+  }
+
+  public remove(id) {
+    this.guardNode(id);
+    this.defaultMap.nodeMap[id] = undefined;
+    delete this.defaultMap.nodeMap[id];
   }
 
   public toFiles(): { [key: string]: string } {
