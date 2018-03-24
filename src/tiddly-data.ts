@@ -260,6 +260,13 @@ export class DefaultFilter2 extends Wiki {
   }
 }
 
+export interface BoundingBox {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
 export class TiddlyMap {
   private defaultMap: DefaultMap;
   private defaultFilter: DefaultFilter2;
@@ -316,6 +323,28 @@ export class TiddlyMap {
   public hide(node: Node): void {
     if (!this.defaultFilter.exist(node.id)) return;
     this.defaultFilter.removeById(node.id);
+  }
+
+  public getBoundingBox(): BoundingBox {
+    let bb = {
+      left: 0,
+      top: 0,
+      right: 0,
+      bottom: 0
+    }
+
+    for (const id in this.nodeMap) {
+      const node = this.nodeMap[id];
+      if (this.isVisible(node)) {
+        const { x, y } = this.position(node.id);
+        if (bb.left > x) bb.left = x;
+        if (bb.top > y) bb.top = y;
+        if (bb.right < x) bb.right = x;
+        if (bb.bottom < y) bb.bottom = y;
+      }
+    }
+
+    return bb;
   }
 
   public toFiles(): { [key: string]: string } {

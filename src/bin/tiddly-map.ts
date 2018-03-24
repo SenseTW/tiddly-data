@@ -90,6 +90,7 @@ const template_map = {
 const trello = async (argv) => {
   console.log(`read the current map from ${argv.directory}/`);
   const tm = await createTiddlyMapFromDirectory(argv.directory);
+  const bounding_box = tm.getBoundingBox();
 
   const now = moment().format(D.TIME_FORMAT);
 
@@ -175,7 +176,7 @@ const trello = async (argv) => {
     const node = new D.Node(raw);
     // get the old position
     let p = tm.position(node.id);
-    if (!p) p = { x: 0, y: i * 32 };
+    if (!p) p = { x: bounding_box.left, y: bounding_box.bottom + 48 + i * 32 };
     tm.add(node, p);
     if (/^Inbox - /.test(node.title)) {
       tm.hide(node);
