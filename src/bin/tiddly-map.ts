@@ -3,7 +3,7 @@ import * as path from 'path';
 import { readdir, readFile, outputFile } from 'fs-extra';
 import * as yargs from 'yargs';
 import axios from 'axios';
-import * as momnet from 'moment';
+import * as moment from 'moment';
 import * as uuidv5 from 'uuid/v5';
 import { keys } from 'ramda';
 import * as D from '../tiddly-data';
@@ -41,11 +41,32 @@ const createTiddlyMapFromDirectory = async (directory: string) => {
   const default_filter_name = `${D.TIDDLY_MAP_PREFIX}_${D.TIDDLY_MAP_DEFAULT_FILTER_NAME}`;
 
   if (!file_map[default_map_name]) {
-    throw new Error('default map not fonud!');
+    console.warn('default map not found! create one');
+
+    const now = moment().format(D.TIME_FORMAT);
+
+    file_map[default_map_name] = {
+      created: now,
+      modified: now,
+      title: '$:/plugins/felixhayashi/tiddlymap/graph/views/Default/map',
+      type: 'text/vnd.tiddlywiki',
+      filter: '',
+      text: `\n{}`
+    };
   }
 
   if (!file_map[default_filter_name]) {
-    throw new Error('default filter not found!');
+    console.warn('default filter not found! create one');
+
+    const now = moment().format(D.TIME_FORMAT);
+
+    file_map[default_filter_name] = {
+      created: now,
+      modified: now,
+      title: '$:/plugins/felixhayashi/tiddlymap/graph/views/Default/filter/nodes',
+      filter: '',
+      type: 'text/vnd.tiddlywiki'
+    }
   }
 
   default_map = new D.DefaultMap(file_map[default_map_name]);
@@ -84,13 +105,15 @@ const template_map = {
 }
 
 const trello = async (argv) => {
-  const now = momnet().format(D.TIME_FORMAT);
+  console.log(`read the current map from ${argv.directory}/`);
+  const tm = await createTiddlyMapFromDirectory(argv.directory);
+
+  const now = moment().format(D.TIME_FORMAT);
 
   // states
-  const position_map = {};
-  const node_map = {};
   const list_map = {};
-  const card_map = {};
+
+  console.log(`fetch board ${argv.board} to ${argv.directory}/`);
 
   const { data: lists } = await axios.get(`${API_LOCATION}/boards/${argv.board}/lists`);
   let i = 0;
@@ -107,7 +130,7 @@ const trello = async (argv) => {
 
   const { data: cards } = await axios.get(`${API_LOCATION}/boards/${argv.board}/cards`);
   for (const card of cards) {
-    console.log('get source for card ' + card.shortUrl);
+    console.log('  get source for card ' + card.shortUrl);
     const { data: attachments } = await axios.get(`${API_LOCATION}/cards/${card.id}/attachments`);
     const [a] = attachments;
 
@@ -117,7 +140,6 @@ const trello = async (argv) => {
 
     const l = getLabel(card);
     list_map[card.idList].cards[l].push(card);
-    card_map[card.id] = card;
   }
 
   // create wikis from lists
@@ -164,38 +186,28 @@ const trello = async (argv) => {
         if (template_map[label]) raw.text += '||' + template_map[label];
         raw.text += '}}\n';
 
-        const node = new D.Node(raw_card);
-        node_map[node.id] = node;
+        let old_node = tm.getNode(raw_card.tmap.id);
+        let new_node = new D.Node(raw_card);
+        if (old_node) {
+          tm.update(new_node);
+        } else {
+          tm.add(new_node);
+        }
       }
     }
 
-    const node = new D.Node(raw);
-    position_map[node.id] = list.position;
-    list_map[node.id] = node;
-    node_map[node.id] = node;
+    const old_node = tm.getNode(raw.tmap.id);
+    const new_node = new D.Node(raw);
+    if (old_node) {
+      const p = tm.position(old_node.id);
+      tm.update(new_node, p);
+    } else {
+      const p = list.position;
+      tm.add(new_node, p);
+    }
   }
 
-  const default_map = {
-    created: now,
-    modified: now,
-    title: '$:/plugins/felixhayashi/tiddlymap/graph/views/Default/map',
-    type: 'text/vnd.tiddlywiki',
-    filter: '',
-    text: `\n${JSON.stringify(position_map, null, 2)}`
-  };
-
-  const default_filter = {
-    created: now,
-    modified: now,
-    title: '$:/plugins/felixhayashi/tiddlymap/graph/views/Default/filter/nodes',
-    type: 'text/vnd.tiddlywiki',
-    text: `\n${JSON.stringify(list_map, null, 2)}`
-  }
-
-  const tw = new D.TiddlyMap(new D.DefaultMap(default_map), new D.DefaultFilter(default_filter), node_map);
-
-  const files = tw.toFiles();
-  console.log(`fetch board ${argv.board} to ${argv.directory}/`);
+  const files = tm.toFiles();
   for (const filename in files) {
     const filepath = path.resolve(argv.directory, filename);
     console.log(`  ${filename}`);
