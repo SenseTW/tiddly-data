@@ -119,9 +119,22 @@ export type Point = {
 export const EmptyPoint: Point = { x: 0, y: 0 };
 
 export class DefaultMap extends Wiki {
+  static createEmptyDefaultMap(m: moment.Moment) {
+    const time = m.format(TIME_FORMAT);
+
+    return new DefaultMap({
+      created: time,
+      modified: time,
+      title: '$:/plugins/felixhayashi/tiddlymap/graph/views/Default/map',
+      type: 'text/vnd.tiddlywiki',
+      filter: '',
+      text: `\n{}`
+    });
+  }
+
   public nodeMap: { [key: string]: Point };
 
-  constructor({ text = '', ...rest } = {}) {
+  constructor({ text = '', ...rest }) {
     super(rest);
 
     try {
@@ -172,6 +185,18 @@ export class DefaultFilter extends Wiki {
 }
 
 export class DefaultFilter2 extends Wiki {
+  static createEmptyDefaultFilter(m: moment.Moment) {
+    const time = m.format(TIME_FORMAT);
+
+    return new DefaultFilter2({
+      created: time,
+      modified: time,
+      title: '$:/plugins/felixhayashi/tiddlymap/graph/views/Default/filter/nodes',
+      filter: '',
+      type: 'text/vnd.tiddlywiki'
+    });
+  }
+
   private filter: F.Expression[];
 
   constructor({ filter =  '', ...rest }) {

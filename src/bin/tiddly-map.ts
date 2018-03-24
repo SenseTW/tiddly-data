@@ -40,37 +40,20 @@ const createTiddlyMapFromDirectory = async (directory: string) => {
   const default_map_name = `${D.TIDDLY_MAP_PREFIX}_${D.TIDDLY_MAP_DEFAULT_MAP_NAME}`;
   const default_filter_name = `${D.TIDDLY_MAP_PREFIX}_${D.TIDDLY_MAP_DEFAULT_FILTER_NAME}`;
 
+  const m = moment();
   if (!file_map[default_map_name]) {
     console.warn('default map not found! create one');
-
-    const now = moment().format(D.TIME_FORMAT);
-
-    file_map[default_map_name] = {
-      created: now,
-      modified: now,
-      title: '$:/plugins/felixhayashi/tiddlymap/graph/views/Default/map',
-      type: 'text/vnd.tiddlywiki',
-      filter: '',
-      text: `\n{}`
-    };
+    default_map = D.DefaultMap.createEmptyDefaultMap(m);
+  } else {
+    default_map = new D.DefaultMap(file_map[default_map_name]);
   }
 
   if (!file_map[default_filter_name]) {
     console.warn('default filter not found! create one');
-
-    const now = moment().format(D.TIME_FORMAT);
-
-    file_map[default_filter_name] = {
-      created: now,
-      modified: now,
-      title: '$:/plugins/felixhayashi/tiddlymap/graph/views/Default/filter/nodes',
-      filter: '',
-      type: 'text/vnd.tiddlywiki'
-    }
+    default_filter = D.DefaultFilter2.createEmptyDefaultFilter(m);
+  } else {
+    default_filter = new D.DefaultFilter2(file_map[default_filter_name]);
   }
-
-  default_map = new D.DefaultMap(file_map[default_map_name]);
-  default_filter = new D.DefaultFilter2(file_map[default_filter_name]);
 
   // check if every tmap exists
   for (const k in default_map.nodeMap) {
