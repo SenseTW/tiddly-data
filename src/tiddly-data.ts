@@ -197,6 +197,10 @@ export class DefaultFilter2 extends Wiki {
     return value === id;
   }
 
+  public exist(id: string) {
+    return findIndex(this.getIndex(id), this.filter) !== -1;
+  }
+
   public push(id: string) {
     // check if the id is already exist
     const i = findIndex(
@@ -248,16 +252,6 @@ export class TiddlyMap {
     }
   }
 
-  /*
-  public getDefaultMap(): DefaultMap {
-    return this.defaultMap;
-  }
-
-  public getDefaultFilter(): DefaultFilter2 {
-    return this.defaultFilter;
-  }
-  */
-
   public getNode(id: string): Node {
     return this.nodeMap[id];
   }
@@ -267,21 +261,11 @@ export class TiddlyMap {
     this.defaultMap.nodeMap[id] = p;
   }
 
-  public position(id): Point {
+  public position(id): (Point | undefined) {
     return clone(this.defaultMap.nodeMap[id]);
   }
 
-  public add(node: Node, p?: Point) {
-    this.nodeMap[node.id] = node;
-
-    // show the node if it comes with its coordinate
-    if (p) {
-      this.defaultMap.nodeMap[node.id] = p;
-      this.defaultFilter.push(node.id);
-    }
-  }
-
-  public update(node: Node, p?: Point) {
+  public add(node: Node, p?: Point): void {
     this.nodeMap[node.id] = node;
 
     if (p) {
@@ -289,11 +273,23 @@ export class TiddlyMap {
     }
   }
 
-  public remove(node: Node) {
-    this.nodeMap[node.id] = undefined;
-    delete this.nodeMap[node.id];
-    this.defaultMap.nodeMap[node.id] = undefined;
+  public remove(node: Node): void {
+    this.defaultFilter.removeById(node.id);
     delete this.defaultMap.nodeMap[node.id];
+    delete this.nodeMap[node.id];
+  }
+
+  public isVisible(node: Node): boolean {
+    return this.defaultFilter.exist(node.id);
+  }
+
+  public show(node: Node): void {
+    if (this.defaultFilter.exist(node.id)) return;
+    this.defaultFilter.push(node.id);
+  }
+
+  public hide(node: Node): void {
+    if (!this.defaultFilter.exist(node.id)) return;
     this.defaultFilter.removeById(node.id);
   }
 

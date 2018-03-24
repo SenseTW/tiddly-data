@@ -116,16 +116,13 @@ const trello = async (argv) => {
   console.log(`fetch board ${argv.board} to ${argv.directory}/`);
 
   const { data: lists } = await axios.get(`${API_LOCATION}/boards/${argv.board}/lists`);
-  let i = 0;
   for (const list of lists) {
     list.cards = {
       '政府與研究報告': [],
       '外部意見': [],
       '其他': []
     };
-    list.position = { x: 20, y: 20 + 32 * i };
     list_map[list.id] = list;
-    i++;
   }
 
   const { data: cards } = await axios.get(`${API_LOCATION}/boards/${argv.board}/cards`);
@@ -143,6 +140,7 @@ const trello = async (argv) => {
   }
 
   // create wikis from lists
+  let i = 0;
   for (const list of lists) {
     const raw = {
       created: now,
@@ -186,24 +184,21 @@ const trello = async (argv) => {
         if (template_map[label]) raw.text += '||' + template_map[label];
         raw.text += '}}\n';
 
-        let old_node = tm.getNode(raw_card.tmap.id);
-        let new_node = new D.Node(raw_card);
-        if (old_node) {
-          tm.update(new_node);
-        } else {
-          tm.add(new_node);
-        }
+        let node = new D.Node(raw_card);
+        tm.add(node);
       }
     }
 
-    const old_node = tm.getNode(raw.tmap.id);
-    const new_node = new D.Node(raw);
-    if (old_node) {
-      const p = tm.position(old_node.id);
-      tm.update(new_node, p);
-    } else {
-      const p = list.position;
-      tm.add(new_node, p);
+    const node = new D.Node(raw);
+    // get the old position
+    let p = tm.position(node.id);
+    if (!p) p = { x: 0, y: i * 32 };
+    tm.add(node, p);
+    if (/^Inbox - /.test(node.title)) {
+      tm.hide(node);
+    } else if (!tm.isVisible(node)) {
+      tm.show(node);
+      i++;
     }
   }
 
