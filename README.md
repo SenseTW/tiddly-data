@@ -12,17 +12,18 @@ Tools for processing wikitext files of TiddlyWiki. Plus more tools for nodes and
 
 # ToDo
 
-* [ ] Model everything
+* [x] Model everything
   * [x] Wikitext
   * [x] Map node
-  * [ ] Map edge(optional)
+  * [x] Map edge(optional)
 * [x] Parse wikitext files
   * [x] ~~Find a parser~~
   * [x] Write a naive parser with [parsimmon][parsimmon]
 * [x] Dump a TiddlyMap back to a folder
 * [x] Create nodes from Trello cards
-* [ ] Create nodes from Hypothes.is comments and highlights
+* [x] ~~Create nodes from Hypothes.is comments and highlights~~
 * [x] Merge a existing TiddlyMap folder with a partial TiddlyMap
-* [ ] Create a service instead of console tools
+* [x] ~~Create a service instead of console tools~~
+* [ ] Create a TiddlyWiki plugin instead of a console tool
 
 [parsimmon]: https://github.com/jneen/parsimmon
