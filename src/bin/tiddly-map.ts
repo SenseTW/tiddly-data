@@ -168,7 +168,7 @@ const trello = async (argv) => {
         if (template_map[label]) raw.text += '||' + template_map[label];
         raw.text += '}}\n';
 
-        let node = new D.Node(raw_card);
+        const node = new D.Node(raw_card);
         tm.add(node);
       }
     }
@@ -177,6 +177,8 @@ const trello = async (argv) => {
     // get the old position
     let p = tm.position(node.id);
     if (!p) p = { x: bounding_box.left, y: bounding_box.bottom + 48 + i * 32 };
+    const old = tm.getNode(node.id);
+    if (old && old.edges) node.edges = old.edges;
     tm.add(node, p);
     if (/^Inbox - /.test(node.title)) {
       tm.hide(node);
