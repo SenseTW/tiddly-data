@@ -163,6 +163,8 @@ const trello = async (argv) => {
         const raw_card = {
           created: now,
           modified: now,
+          // save the original title for transclusion
+          article_title: title.name,
           title: name,
           source: card.source,
           tags: title.tags.join(' '),
