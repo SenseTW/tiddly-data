@@ -119,6 +119,16 @@ const trello = async (argv) => {
       card.source = a.url;
     }
 
+    console.log('  get comments for card ' + card.shortUrl);
+    const { data: actions } = await axios.get(`${API_LOCATION}/cards/${card.id}/actions`);
+    let comments = [];
+    for (const a of actions) {
+      if (a.type === 'commentCard') {
+        comments.push(a.data.text);
+      }
+    }
+    card.comments = comments;
+
     const l = getLabel(card);
     list_map[card.idList].cards[l].push(card);
   }
@@ -160,7 +170,7 @@ const trello = async (argv) => {
             id: P.idFrom(card.id)
           },
           type: 'text/vnd.tiddlywiki',
-          text: card.desc
+          text: card.comments.join('\n\n') + '\n\n' + card.desc
         }
 
         // append the card link to the list node
